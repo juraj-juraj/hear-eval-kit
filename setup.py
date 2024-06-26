@@ -31,7 +31,7 @@ setup(
         "intervaltree",
         "more-itertools",
         # for tf 2.6.0
-        "numpy==1.19.2",
+        "numpy>=1.24.3",
         "pandas",
         "pynvml",
         "pytorch-lightning>=1.6",
@@ -46,7 +46,7 @@ setup(
         # "wandb",
         "scikit-learn>=0.24.2",
         # otherwise librosa breaks, which fucking dcase-util requires
-        "numba==0.48",
+        "numba",
         # "numba>=0.49.0",  # not directly required, pinned by Snyk to avoid a vulnerability
     ],
     extras_require={
