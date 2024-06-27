@@ -32,7 +32,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import soundfile as sf
-import tensorflow as tf
 import torch
 from intervaltree import IntervalTree
 from torch.utils.data import DataLoader, Dataset
@@ -42,7 +41,6 @@ from tqdm.auto import tqdm
 import heareval.gpu_max_mem as gpu_max_mem
 
 TORCH = "torch"
-TENSORFLOW = "tf"
 
 
 class Embedding:
@@ -80,10 +78,6 @@ class Embedding:
             self.type = TORCH
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
             self.model.to(self.device)
-        elif isinstance(self.model, tf.Module):
-            self.type = TENSORFLOW
-            # Tensorflow automatically manages data transfers to device,
-            # so we don't need to set self.device
         else:
             raise TypeError(f"Unsupported model type received: {type(self.model)}")
 
@@ -111,13 +105,6 @@ class Embedding:
                     f"torch audio embedding models. "
                     f"Received: {type(x)}"
                 )
-
-        elif self.type == TENSORFLOW:
-            # Load array as tensor onto device
-
-            if not isinstance(x, np.ndarray):
-                x = x.numpy()
-            x = tf.convert_to_tensor(x)
         else:
             raise AssertionError("Unknown type")
 
@@ -133,11 +120,6 @@ class Embedding:
                     audio, self.model
                 )
                 return embeddings.detach().cpu().numpy()
-        elif self.type == TENSORFLOW:
-            embeddings = self.module.get_scene_embeddings(  # type: ignore
-                audio, self.model
-            )
-            return embeddings.numpy()
         else:
             raise NotImplementedError("Unknown type")
 
@@ -156,16 +138,6 @@ class Embedding:
                 embeddings = embeddings.detach().cpu().numpy()
                 timestamps = timestamps.detach().cpu().numpy()
                 return embeddings, timestamps
-        elif self.type == TENSORFLOW:
-            # flake8: noqa
-            embeddings, timestamps = self.module.get_timestamp_embeddings(  # type: ignore
-                audio,
-                self.model,
-            )
-            gpu_max_mem.measure()
-            embeddings = embeddings.numpy()
-            timestamps = timestamps.numpy()
-            return embeddings, timestamps
         else:
             raise NotImplementedError("Unknown type")
 
@@ -196,7 +168,7 @@ class AudioFileDataset(Dataset):
 def get_dataloader_for_embedding(
     data: Dict, audio_dir: Path, embedding: Embedding, batch_size: int = 64
 ):
-    if embedding.type == TORCH or embedding.type == TENSORFLOW:
+    if embedding.type == TORCH:
         return DataLoader(
             AudioFileDataset(data, audio_dir, embedding.sample_rate),
             batch_size=batch_size,
