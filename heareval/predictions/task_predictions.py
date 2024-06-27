@@ -268,7 +268,7 @@ class AbstractPredictionModel(pl.LightningModule):
             if isinstance(score_ret, tuple):
                 end_scores[f"{name}_{score}"] = score_ret[0][1]
                 # All other scores will also be logged
-                for (subscore, value) in score_ret:
+                for subscore, value in score_ret:
                     end_scores[f"{name}_{score}_{subscore}"] = value
             elif isinstance(score_ret, float):
                 end_scores[f"{name}_{score}"] = score_ret
@@ -1013,7 +1013,8 @@ def task_predictions_train(
     # profiler = pl.profiler.AdvancedProfiler(output_filename="predictions-profile.txt")
     trainer = pl.Trainer(
         callbacks=[checkpoint_callback, early_stop_callback],
-        gpus=gpus,
+        accelerator="auto",
+        devices=gpus,
         check_val_every_n_epoch=conf["check_val_every_n_epoch"],
         max_epochs=conf["max_epochs"],
         deterministic=deterministic,
