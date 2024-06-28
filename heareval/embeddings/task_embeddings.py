@@ -44,6 +44,9 @@ import heareval.gpu_max_mem as gpu_max_mem
 TORCH = "torch"
 TENSORFLOW = "tf"
 
+if not torch.cuda.is_available():
+    raise Exception("Cannot operate without cuda")
+
 
 class Embedding:
     """
