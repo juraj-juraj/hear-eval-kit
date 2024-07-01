@@ -30,23 +30,21 @@ setup(
         "dcase_util",
         "intervaltree",
         "more-itertools",
-        # for tf 2.6.0
         "numpy>=1.24.3",
         "pandas",
         "pynvml",
-        "pytorch-lightning==1.9.5",
+        "pytorch-lightning<2.0",
         "python-slugify",
         "sed_eval",
         "soundfile",
         "spotty",
-        "tensorflow>=2.0",
         "torch",
         "torchinfo",
         "tqdm",
         # "wandb",
         "scikit-learn>=0.24.2",
         # otherwise librosa breaks, which fucking dcase-util requires
-        "numba",
+        # "numba",
         # "numba>=0.49.0",  # not directly required, pinned by Snyk to avoid a vulnerability
     ],
     extras_require={

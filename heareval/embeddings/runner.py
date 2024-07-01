@@ -10,7 +10,6 @@ import time
 from pathlib import Path
 
 import click
-import tensorflow as tf
 import torch
 from slugify import slugify
 from tqdm import tqdm
