@@ -122,6 +122,9 @@ EVENT_POSTPROCESSING_GRID = {
     #    "min_duration": [0, 62, 125, 250, 500, 1000],
 }
 
+if not torch.cuda.is_available():
+    raise Exception("Cannot operate without cuda")
+
 NUM_WORKERS = int(multiprocessing.cpu_count() / (max(1, torch.cuda.device_count())))
 
 
@@ -1013,8 +1016,8 @@ def task_predictions_train(
     # profiler = pl.profiler.AdvancedProfiler(output_filename="predictions-profile.txt")
     trainer = pl.Trainer(
         callbacks=[checkpoint_callback, early_stop_callback],
-        accelerator="auto",
-        devices=gpus,
+        accelerator="gpu",
+        #devices=gpus,
         check_val_every_n_epoch=conf["check_val_every_n_epoch"],
         max_epochs=conf["max_epochs"],
         deterministic=deterministic,
